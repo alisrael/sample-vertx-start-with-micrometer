@@ -40,16 +40,6 @@ public class MainVerticle extends AbstractVerticle {
 
   @Override
   public void start(Future<Void> startFuture) throws Exception {
-//    VertxOptions vertxOpts = new VertxOptions();
-//    Vertx vertx = Vertx.vertx(new VertxOptions().setMetricsOptions(
-//      new MicrometerMetricsOptions()
-//        .setJmxMetricsOptions(new VertxJmxMetricsOptions()
-//          .setDomain("localhost")
-//          .setStep(5)
-//          .setEnabled(true))
-//        .setEnabled(true)));
-//    this.vertx = vertx;
-
     Future<Void> steps = prepareDatabase().compose(v -> startHttpServer());
     steps.setHandler(startFuture.completer());
   }

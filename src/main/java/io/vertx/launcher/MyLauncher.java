@@ -1,7 +1,6 @@
 package io.vertx.launcher;
 
 import io.vertx.core.Launcher;
-import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.micrometer.MicrometerMetricsOptions;
