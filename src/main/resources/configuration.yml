@@ -1,0 +1,7 @@
+# Java Tracing
+com.instana.plugin.javatrace:
+  instrumentation:
+  # By default no packages are scanned for SDK annotations.
+  sdk:
+  packages:
+  - 'io.vertx.starter'
