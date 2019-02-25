@@ -6,8 +6,11 @@ Using micrometer metrics in Vertx sample "starter" application (https://github.c
 MyLauncher.java - configures Vertx to use MicrometerMetricsOptions
 
 Main Class: io.vertx.launcher.MyLauncher
+
 Program Args: run io.vertx.starter.MainVerticle -conf src/main/resources/config-local.json
 
 Routes:
+
 / - wiki main page
+
 /metrics - returns getMetricsSnapshot for vertx
