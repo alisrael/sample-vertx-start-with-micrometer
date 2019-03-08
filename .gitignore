@@ -11,3 +11,9 @@ buildNumber.properties
 # IntelliJ
 .idea
 *.iml
+
+# db
+db/wi*
+
+#vertx cache
+.vertx/file-cache*

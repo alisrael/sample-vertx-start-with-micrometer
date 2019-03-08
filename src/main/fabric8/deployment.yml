@@ -1,0 +1,16 @@
+spec:
+  template:
+    spec:
+      containers:
+        - ports:
+            - containerPort: 8080
+          env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: KUBERNETES_LABELS
+              value: ${ispn.cluster.labels}
+            - name: JAVA_ARGS
+              value: '-Dvertx.cacheDirBase=/tmp -Djava.net.preferIPv4Stack=true'

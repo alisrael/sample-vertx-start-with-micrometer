@@ -34,7 +34,7 @@ public class MyLauncher extends Launcher {
 
     options.setMetricsOptions(
       new MicrometerMetricsOptions()
-        .setPrometheusOptions(new VertxPrometheusOptions().setEnabled(true))
+//        .setPrometheusOptions(new VertxPrometheusOptions().setEnabled(true))
 //        .setJmxMetricsOptions(new Pro
 //          .setEnabled(true))
         .setEnabled(true));

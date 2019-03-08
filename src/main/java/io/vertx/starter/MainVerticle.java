@@ -1,24 +1,22 @@
 package io.vertx.starter;
 
 import com.github.rjeschke.txtmark.Processor;
-import io.vertx.core.AbstractVerticle;
+import io.vertx.circuitbreaker.CircuitBreakerOptions;
 import io.vertx.core.Future;
-import io.vertx.core.Vertx;
-import io.vertx.core.VertxOptions;
-import io.vertx.core.http.HttpServer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.jdbc.JDBCClient;
-import io.vertx.ext.sql.SQLConnection;
-import io.vertx.ext.web.Router;
-import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.handler.BodyHandler;
-import io.vertx.ext.web.templ.freemarker.FreeMarkerTemplateEngine;
-import io.vertx.micrometer.MetricsService;
-import io.vertx.micrometer.MicrometerMetricsOptions;
-import io.vertx.micrometer.VertxJmxMetricsOptions;
+import io.vertx.reactivex.circuitbreaker.CircuitBreaker;
+import io.vertx.reactivex.core.AbstractVerticle;
+import io.vertx.reactivex.core.http.HttpServer;
+import io.vertx.reactivex.ext.jdbc.JDBCClient;
+import io.vertx.reactivex.ext.sql.SQLConnection;
+import io.vertx.reactivex.ext.web.Router;
+import io.vertx.reactivex.ext.web.RoutingContext;
+import io.vertx.reactivex.ext.web.handler.BodyHandler;
+import io.vertx.reactivex.ext.web.templ.freemarker.FreeMarkerTemplateEngine;
+import io.vertx.reactivex.micrometer.MetricsService;
 
 import java.util.Date;
 import java.util.List;
@@ -39,7 +37,7 @@ public class MainVerticle extends AbstractVerticle {
   private FreeMarkerTemplateEngine templateEngine;
 
   @Override
-  public void start(Future<Void> startFuture) throws Exception {
+  public void start(Future<Void> startFuture) {
     Future<Void> steps = prepareDatabase().compose(v -> startHttpServer());
     steps.setHandler(startFuture.completer());
   }
@@ -85,6 +83,8 @@ public class MainVerticle extends AbstractVerticle {
     router.post("/create").handler(this::pageCreateHandler);
     router.post("/delete").handler(this::pageDeletionHandler);
     router.get("/metrics").handler(this::metrics);
+    router.get("/boom").handler(this::boom);
+//    router.get("/hystrix-metrics").handler(HystrixMetricHandler.create(vertx));
 
     templateEngine = FreeMarkerTemplateEngine.create(vertx);
 
@@ -260,6 +260,28 @@ public class MainVerticle extends AbstractVerticle {
     } else {
       context.response().end("No metrics (null)");
     }
+
+  }
+
+  private void boom(RoutingContext context){
+    CircuitBreaker breaker =  CircuitBreaker.create("ft-circuit-breaker", vertx,
+      new CircuitBreakerOptions().setMaxRetries(1)
+        .setMaxFailures(1)
+        .setTimeout(1)
+        .setFallbackOnFailure(false)
+        .setResetTimeout(1));
+
+    breaker.rxExecuteCommand(future ->{
+      try{      wait(5);
+      future.complete();}
+      catch (Exception e){
+        future.fail("boom boom");
+      }
+    }).subscribe(result ->{
+      context.response().end("boom success");
+    }, err ->{
+      context.response().end("boom fail " + err.getMessage());
+    });
 
   }
 }
